@@ -1,4 +1,4 @@
-import { GluestackUIProvider, Text } from "@gluestack-ui/themed";
+import { GluestackUIProvider } from "@gluestack-ui/themed";
 import { StatusBar } from "react-native";
 import { config } from "./config/gluestack-ui.config";
 import {
@@ -7,7 +7,7 @@ import {
   useFonts,
 } from "@expo-google-fonts/roboto";
 import { Loader } from "@components/Loader";
-import { SignIn } from "@screens/SignIn";
+import { Routes } from "@routes/index";
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -22,7 +22,7 @@ export default function App() {
         backgroundColor="transparent"
         translucent
       />
-      {fontsLoaded ? <SignIn /> : <Loader />}
+      {fontsLoaded ? <Routes /> : <Loader />}
     </GluestackUIProvider>
   );
 }
