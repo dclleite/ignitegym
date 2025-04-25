@@ -1,5 +1,5 @@
-import { Alert, ScrollView, TouchableOpacity } from "react-native";
-import { Center, Heading, Text, VStack } from "@gluestack-ui/themed";
+import { ScrollView, TouchableOpacity } from "react-native";
+import { Center, Heading, Text, useToast, VStack } from "@gluestack-ui/themed";
 
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system";
@@ -9,6 +9,7 @@ import { Input } from "@components/Input";
 import { ScreenHeader } from "@components/ScreenHeader";
 import { UserPhoto } from "@components/UserPhoto";
 import { useState } from "react";
+import { ToastMessage } from "@components/ToastMessage";
 
 const PHOTO_CONFIG = {
   MAX_SIZE_MB: 5,
@@ -23,6 +24,8 @@ const ERROR_MESSAGES = {
 
 export function Profile() {
   const [userPhoto, setUserPhoto] = useState("https://github.com/dclleite.png");
+
+  const toast = useToast();
 
   async function handleUserPhotoSelect(): Promise<void> {
     try {
@@ -41,7 +44,18 @@ export function Profile() {
       await validateAndUpdatePhoto(photoUri);
     } catch (error) {
       console.error("[handleUserPhotoSelect]:", error);
-      Alert.alert("Error", ERROR_MESSAGES.GENERAL_ERROR);
+      toast.show({
+        placement: "top",
+        render: ({ id }) => (
+          <ToastMessage
+            id={id}
+            title="Error"
+            description={ERROR_MESSAGES.GENERAL_ERROR}
+            action="error"
+            onClose={() => toast.close(id)}
+          />
+        ),
+      });
     }
   }
 
@@ -55,7 +69,18 @@ export function Profile() {
     console.log("Photo info:", photoInfo);
     const sizeInMB = photoInfo.size / 1024 / 1024;
     if (sizeInMB > PHOTO_CONFIG.MAX_SIZE_MB) {
-      Alert.alert("Error", ERROR_MESSAGES.SIZE_EXCEEDED);
+      toast.show({
+        placement: "top",
+        render: ({ id }) => (
+          <ToastMessage
+            id={id}
+            title="Error"
+            description={ERROR_MESSAGES.SIZE_EXCEEDED}
+            action="error"
+            onClose={() => toast.close(id)}
+          />
+        ),
+      });
       return;
     }
 
