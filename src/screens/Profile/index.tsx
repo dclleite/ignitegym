@@ -66,7 +66,6 @@ export function Profile() {
       throw new Error("Photo file not found");
     }
 
-    console.log("Photo info:", photoInfo);
     const sizeInMB = photoInfo.size / 1024 / 1024;
     if (sizeInMB > PHOTO_CONFIG.MAX_SIZE_MB) {
       toast.show({

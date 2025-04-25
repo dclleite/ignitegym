@@ -7,6 +7,10 @@ import {
   VStack,
 } from "@gluestack-ui/themed";
 import { useNavigation } from "@react-navigation/native";
+import { Controller, useForm } from "react-hook-form";
+
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 import BackgroundImg from "@assets/background.png";
 import Logo from "@assets/logo.svg";
@@ -16,11 +20,51 @@ import { Button } from "@components/Button";
 
 import { AuthNavigatorRoutesProps } from "@routes/auth.routes";
 
+type FormDataProps = {
+  name: string;
+  email: string;
+  password: string;
+  password_confirm: string;
+};
+
+const signUpSchema = yup.object({
+  name: yup.string().required("Name is required"),
+  email: yup
+    .string()
+    .required("Email is required")
+    .email("Invalid email address"),
+  password: yup
+    .string()
+    .required("Password is required")
+    .min(6, "Password must be at least 6 characters"),
+  password_confirm: yup
+    .string()
+    .required("Please confirm your password")
+    .oneOf([yup.ref("password"), ""], "Passwords do not match"),
+});
+
 export function SignUp() {
   const navigation = useNavigation<AuthNavigatorRoutesProps>();
 
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormDataProps>({
+    resolver: yupResolver(signUpSchema),
+  });
+
   function handleGoBack() {
     navigation.goBack();
+  }
+
+  function handleSignUp({
+    name,
+    email,
+    password,
+    password_confirm,
+  }: FormDataProps) {
+    console.log({ name, email, password, password_confirm });
   }
 
   return (
@@ -49,23 +93,70 @@ export function SignUp() {
           </Center>
 
           <Center flex={1} gap="$2">
-            <Heading color="$gray100">Create your account</Heading>
+            <Heading color="$gray100">Create Account</Heading>
 
-            <Input placeholder="Name" />
-
-            <Input
-              placeholder="Email"
-              keyboardType="email-address"
-              autoCapitalize="none"
+            <Controller
+              control={control}
+              name="name"
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  placeholder="Full Name"
+                  onChangeText={onChange}
+                  value={value}
+                  errorMessage={errors.name?.message}
+                />
+              )}
             />
-            <Input placeholder="Password" secureTextEntry />
+            <Controller
+              control={control}
+              name="email"
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  placeholder="Email Address"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  onChangeText={onChange}
+                  value={value}
+                  errorMessage={errors.email?.message}
+                />
+              )}
+            />
+            <Controller
+              control={control}
+              name="password"
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  placeholder="Password"
+                  secureTextEntry
+                  onChangeText={onChange}
+                  value={value}
+                  errorMessage={errors.password?.message}
+                />
+              )}
+            />
 
-            <Button title="Create and access" />
+            <Controller
+              control={control}
+              name="password_confirm"
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  placeholder="Confirm Password"
+                  secureTextEntry
+                  onChangeText={onChange}
+                  value={value}
+                  onSubmitEditing={handleSubmit(handleSignUp)}
+                  returnKeyType="send"
+                  errorMessage={errors.password_confirm?.message}
+                />
+              )}
+            />
+
+            <Button title="Sign Up" onPress={handleSubmit(handleSignUp)} />
           </Center>
 
           <Button
             onPress={handleGoBack}
-            title="Back to login"
+            title="Return to Login"
             variant="outline"
             mt="$12"
           />
