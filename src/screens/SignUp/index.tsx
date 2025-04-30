@@ -23,6 +23,7 @@ import { AuthNavigatorRoutesProps } from "@routes/auth.routes";
 import { api } from "@services/api";
 import { AppError } from "@utils/AppError";
 import { ToastMessage } from "@components/ToastMessage";
+import { useAuth } from "@hooks/useAuth";
 
 type FormDataProps = {
   name: string;
@@ -50,11 +51,12 @@ const signUpSchema = yup.object({
 export function SignUp() {
   const navigation = useNavigation<AuthNavigatorRoutesProps>();
   const toast = useToast();
+  const { singIn } = useAuth();
 
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm<FormDataProps>({
     resolver: yupResolver(signUpSchema),
   });
@@ -66,7 +68,7 @@ export function SignUp() {
   async function handleSignUp({ name, email, password }: FormDataProps) {
     try {
       const response = await api.post("/users", { name, email, password });
-      console.log(response.data);
+      await singIn(email, password);
     } catch (error) {
       const isAppError = error instanceof AppError;
 
@@ -167,7 +169,11 @@ export function SignUp() {
               )}
             />
 
-            <Button title="Sign Up" onPress={handleSubmit(handleSignUp)} />
+            <Button
+              title="Sign Up"
+              onPress={handleSubmit(handleSignUp)}
+              isLoading={isSubmitting}
+            />
           </Center>
 
           <Button
@@ -175,6 +181,7 @@ export function SignUp() {
             title="Return to Login"
             variant="outline"
             mt="$12"
+            isDisabled={isSubmitting}
           />
         </VStack>
       </VStack>

@@ -8,6 +8,7 @@ import {
 } from "@expo-google-fonts/roboto";
 import { Loader } from "@components/Loader";
 import { Routes } from "@routes/index";
+import { AuthContextProvider } from "@contexts/AuthContext";
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -22,7 +23,9 @@ export default function App() {
         backgroundColor="transparent"
         translucent
       />
-      {fontsLoaded ? <Routes /> : <Loader />}
+      <AuthContextProvider>
+        {fontsLoaded ? <Routes /> : <Loader />}
+      </AuthContextProvider>
     </GluestackUIProvider>
   );
 }
