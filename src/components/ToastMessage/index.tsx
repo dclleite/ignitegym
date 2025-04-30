@@ -13,7 +13,7 @@ type Props = {
   title: string;
   description?: string;
   action?: "error" | "success";
-  onClose: () => void;
+  onClose?: () => void;
 };
 
 export function ToastMessage({
@@ -31,9 +31,11 @@ export function ToastMessage({
       mt="$10"
     >
       <VStack space="xs" w="$full">
-        <Pressable alignSelf="flex-end" onPress={onClose}>
-          <Icon as={X} color="$coolGray50" size="md" />
-        </Pressable>
+        {!!onClose && (
+          <Pressable alignSelf="flex-end" onPress={onClose}>
+            <Icon as={X} color="$coolGray50" size="md" />
+          </Pressable>
+        )}
 
         <ToastTitle color="$white" fontFamily="$heading">
           {title}
